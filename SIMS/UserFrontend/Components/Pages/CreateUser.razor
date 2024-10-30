@@ -1,0 +1,47 @@
+﻿@page "/create-user"
+
+@rendermode InteractiveServer
+
+@inject UserFrontend.Data.AppDbContext AppDbContext
+
+@inject NavigationManager NavigationManager
+
+<h3>Create a new User</h3>
+
+<EditForm Model="user" OnSubmit="HandleSubmit">
+		<div class="mb-3">
+		<label class="form-label">User name:</label>
+		<InputText class="form-control" @bind-Value="user.UserName"/>
+	</div>
+
+		<div class="mb-3">
+		<label class="form-label">User role:</label>
+		<InputText class="form-control" @bind-Value="user.Role"/>
+	</div>
+
+		<div class="mb-3">
+		<label class="form-label">Password:</label>
+		<InputText class="form-control" @bind-Value="user.Password"/>
+	</div>
+
+		<div class="mb-3">
+		<label class="form-label">Creation Date:</label>
+		<InputDate class="form-control" @bind-Value="user.CreationDate"/>
+	</div>
+
+	<div>
+		<button type="submit" class="btn btn-primary">Create User</button>
+	</div>
+</EditForm>
+
+@code {
+	private User user = new User();
+
+	private void HandleSubmit()
+	{
+		AppDbContext.Users.Add(user);
+		AppDbContext.SaveChanges();
+
+		NavigationManager.NavigateTo("/");
+	}
+}

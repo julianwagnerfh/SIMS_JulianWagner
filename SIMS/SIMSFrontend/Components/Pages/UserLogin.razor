@@ -1,0 +1,69 @@
+﻿@page "/login"
+@using SIMSAPI.Models
+@inject HttpClient Http
+@rendermode InteractiveServer
+
+<EditForm Model="loginUser" OnValidSubmit="LoginUser" FormName="/Redis/login">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="form-group">
+        <label for="username">Benutzername</label>
+        <InputText id="username" @bind-Value="loginUser.Username" class="form-control" />
+        <ValidationMessage For="@(() => loginUser.Username)" />
+    </div>
+
+    <div class="form-group">
+        <label for="password">Passwort</label>
+        <InputText id="password" @bind-Value="loginUser.Password" type="password" class="form-control" />
+        <ValidationMessage For="@(() => loginUser.Password)" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Einloggen</button>
+
+    @if (!string.IsNullOrEmpty(message))
+    {
+            <div class="alert @alertClass">@message</div>
+    }
+</EditForm>
+
+@code {
+    private LoginUserDto loginUser = new LoginUserDto();
+    private string message;
+    private string alertClass = "alert-danger"; // Standardmäßig als Fehler
+
+    private async Task LoginUser()
+    {
+        try
+        {
+            var response = await Http.PostAsJsonAsync("https://localhost:7227/Redis/login", loginUser);
+
+            if (response.IsSuccessStatusCode)
+            {
+                alertClass = "alert-success"; // Erfolg
+                message = "Login erfolgreich!";
+                // Hier kannst du Redirect oder weitere Logik hinzufügen, z.B. Benutzerstatus setzen.
+            }
+            else if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
+            {
+                alertClass = "alert-danger";
+                message = "Benutzer nicht gefunden.";
+            }
+            else if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+            {
+                alertClass = "alert-danger";
+                message = "Ungültiges Passwort.";
+            }
+            else
+            {
+                alertClass = "alert-danger";
+                message = $"Fehler beim Login: {response.StatusCode} - {await response.Content.ReadAsStringAsync()}";
+            }
+        }
+        catch (Exception ex)
+        {
+            alertClass = "alert-danger";
+            message = $"Es ist ein Fehler aufgetreten: {ex.Message}";
+        }
+    }
+}

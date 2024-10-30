@@ -1,0 +1,67 @@
+﻿@page "/"
+@page "/user"
+
+@rendermode InteractiveServer
+
+@inject UserFrontend.Data.AppDbContext AppDbContext
+
+<PageTitle>User</PageTitle>
+
+<h1>User Overview</h1>
+
+Create and manage users.
+
+@if(users == null)
+{
+	<p>Loading...</p>
+}else{
+			<p>Loading...</p>
+		<table class="table">
+			<thead>
+				<tr>
+					<th>UserId</th>
+					<th>UserName</th>
+					<th>Role</th>
+					<th>Password</th>
+					<th>CreationDate</th>
+					<th>Actions</th>
+				</tr>
+			</thead>
+			<tbody>
+			@foreach (var user in users)
+			{
+						<tr>
+							<td>@user.UserId</td>
+							<td>@user.UserName</td>
+							<td>@user.Role</td>
+							<td>@user.Password</td>
+							<td>@user.CreationDate</td>
+							<td><button @onclick="() => DeleteUser(user.UserId)" class="btn btn-sm btn-danger">Delete</button></td>
+						</tr>
+			}
+			</tbody>
+		</table>
+
+}
+
+@code{
+
+	private IEnumerable<User> users;
+	protected override void OnInitialized(){
+
+		base.OnInitialized();
+		users = AppDbContext.Users.ToList();
+	}
+
+	void DeleteUser(int id){
+		var user = AppDbContext.Users.Find(id);
+
+		if (user != null)
+		{
+			AppDbContext.Users.Remove(user);
+			AppDbContext.SaveChanges();
+		}
+
+		users = AppDbContext.Users.ToList();
+	}
+}

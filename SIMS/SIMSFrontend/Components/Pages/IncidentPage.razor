@@ -1,0 +1,108 @@
+﻿@page "/incidents"
+@using System.Collections
+@using System.Text.Json
+@inject IJSRuntime JSRuntime
+@rendermode InteractiveServer
+
+<PageTitle>ISMS Incidents</PageTitle>
+
+<h3>IncidentPage</h3>
+
+<p>
+    <input @bind="addIncident.bearbeiter"/>
+        <input @bind="addIncident.melder"/>
+    <button @onclick="addNewIncident">Add a new Incident</button>
+</p>
+
+@foreach (var incident in incident)
+{
+        <div>
+    <p><b>IncidentID:</b> @incident.id</p>
+    <p><b>Bearbeiter:</b> @incident.bearbeiter</p>
+    <p><b>Melder:</b> @incident.melder</p>
+    <p><b>Schweregrad:</b> @incident.schweregrad</p>
+    <p><b>Bearbeitungsstatus:</b> @incident.bearbeitungsstatus</p>
+    <p><b>CVE:</b> @incident.cve</p>
+    <p><b>Systembetroffenheit:</b> @incident.systembetroffenheit</p>
+    <p><b>Beschreibung:</b> @incident.beschreibung</p>
+    <p><b>Eskalationslevel:</b> @incident.eskalationslevel</p>
+    <button @onclick="(()=>deleteExistingIncident(incident.id))">Delete this incident</button>
+                <hr />
+            </div>
+        
+
+
+}
+
+@code {
+
+    public class Incident
+    {
+        public int id { get; set; }
+        public string bearbeiter { get; set; }
+        public string melder { get; set; }
+        public string schweregrad { get; set; }
+        public string bearbeitungsstatus { get; set; }
+        public string cve { get; set; }
+        public string systembetroffenheit { get; set; }
+        public string beschreibung { get; set; }
+        public int eskalationslevel { get; set; }
+
+    }
+
+    string ApiUrl = "https://localhost:7227/";
+
+    private IEnumerable<Incident> incident = Array.Empty<Incident>();
+
+    private async Task refreshList()
+    {
+        HttpClient httpClient = new HttpClient();
+        HttpResponseMessage response = await httpClient.GetAsync(ApiUrl + "api/SIMSAPI/GetIncidents");
+        httpClient.Dispose();
+        using var responseStream = await response.Content.ReadAsStreamAsync();
+        incident = await JsonSerializer.DeserializeAsync<IEnumerable<Incident>>(responseStream);
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await this.refreshList();
+    }
+    //Reload
+
+    // Erstelle eine Instanz des Incident-Modells
+    public Incident addIncident = new Incident();
+    
+    private async Task addNewIncident()
+    {
+        var formData = new MultipartFormDataContent();
+
+        // Die Daten der Felder in formData hinzufügen
+        formData.Add(new StringContent(addIncident.bearbeiter), "bearbeiter");
+        formData.Add(new StringContent(addIncident.melder), "melder");
+        // Falls du andere Felder brauchst, füge sie hier hinzu
+        // formData.Add(new StringContent(newIncident.schweregrad), "schweregrad");
+
+        HttpClient httpClient = new HttpClient();
+        HttpResponseMessage response = await httpClient.PostAsync(ApiUrl + "api/SIMSAPI/AddIncident", formData);
+        httpClient.Dispose();
+
+        string res = await response.Content.ReadAsStringAsync();
+
+        // Antwort anzeigen
+        await JSRuntime.InvokeVoidAsync("alert", res);
+        await this.refreshList();
+    }
+
+    private async Task deleteExistingIncident(int id)
+    {
+
+        HttpClient httpClient = new HttpClient();
+        HttpResponseMessage response = await httpClient.DeleteAsync(ApiUrl + "api/SIMSAPI/DeleteIncident?id="+id);
+        httpClient.Dispose();
+        using var responseStream = await response.Content.ReadAsStreamAsync();
+
+        string res = response.Content.ReadAsStringAsync().Result;
+        await JSRuntime.InvokeVoidAsync("alert", res);
+        await this.refreshList();
+    }
+}

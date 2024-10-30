@@ -1,0 +1,46 @@
+version: '3.4'
+
+services:
+  simsapi:
+    image: ${DOCKER_REGISTRY-}simsapi
+    build:
+      context: .
+      dockerfile: SIMSAPI/Dockerfile
+    networks:
+      - sims-network
+
+  simsfrontend:
+    image: ${DOCKER_REGISTRY-}simsfrontend
+    build:
+      context: .
+      dockerfile: SIMSFrontend/Dockerfile
+    networks:
+      - sims-network
+
+  sql1:
+    image: mcr.microsoft.com/mssql/server:2019-latest
+    container_name: sql1
+    environment:
+      - ACCEPT_EULA=Y
+      - MSSQL_SA_PASSWORD=Adm1234!
+      - MSSQL_PID=Express
+    ports:
+      - "1433:1433"
+    expose: 
+      - 1433
+    volumes:
+      - /c/Users/juliw/sql_data:/var/opt/mssql
+    networks:
+      - sims-network
+
+  redis:
+    image: redis:latest
+    container_name: redis
+    ports:
+      - "6379:6379"
+    networks:
+      - sims-network
+
+networks:
+  sims-network:
+    external: true

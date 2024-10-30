@@ -1,0 +1,6 @@
+@SIMSAPI_HostAddress = http://localhost:5222
+
+GET {{SIMSAPI_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

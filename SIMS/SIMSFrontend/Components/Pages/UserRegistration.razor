@@ -1,0 +1,62 @@
+﻿@page "/register"
+@using SIMSFrontend.Models
+@inject HttpClient Http
+@rendermode InteractiveServer
+
+<EditForm Model="registerUser" OnValidSubmit="RegisterUser" FormName="register">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="form-group">
+        <label for="username">Benutzername</label>
+        <InputText id="username" @bind-Value="registerUser.Username" class="form-control" />
+        <ValidationMessage For="@(() => registerUser.Username)" />
+    </div>
+
+    <div class="form-group">
+        <label for="password">Passwort</label>
+        <InputText id="password" @bind-Value="registerUser.Password" type="password" class="form-control" />
+        <ValidationMessage For="@(() => registerUser.Password)" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Registrieren</button>
+</EditForm>
+
+@code {
+    private RegisterUserDto registerUser = new RegisterUserDto();
+    private string message;
+    private bool isSuccessful;
+
+    private async Task RegisterUser()
+    {
+        Console.WriteLine($"Username: {registerUser.Username}, Password: {registerUser.Password}"); // Debugging
+
+        try
+        {
+            var response = await Http.PostAsJsonAsync("https://localhost:7227/Redis/register", registerUser);
+
+            if (response.IsSuccessStatusCode)
+            {
+                isSuccessful = true;
+                message = "Registrierung erfolgreich!";
+            }
+            else if (response.StatusCode == System.Net.HttpStatusCode.Conflict)
+            {
+                isSuccessful = false;
+                message = "Benutzername existiert bereits.";
+            }
+            else
+            {
+                isSuccessful = false;
+                message = $"Fehler bei der Registrierung: {response.StatusCode} - {await response.Content.ReadAsStringAsync()}";
+            }
+        }
+        catch (Exception ex)
+        {
+            isSuccessful = false;
+            message = $"Es ist ein Fehler aufgetreten: {ex.Message}";
+        }
+
+
+    }
+}

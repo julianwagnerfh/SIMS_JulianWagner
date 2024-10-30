@@ -1,6 +1,6 @@
 # SIMSAPI Projekt
 
-![Version](https://badgen.net/badge/Version/4.0.0/blue) ![License](https://badgen.net/badge/License/MIT/green) ![Build](https://badgen.net/badge/Build/Passing/green)
+![Version](https://badgen.net/badge/Version/4.0.0/blue) ![License](https://badgen.net/badge/License/MIT/green)
 
 ## Inhaltsverzeichnis
 

@@ -219,7 +219,7 @@ Das folgende DB-Diagramm zeigt die Datenbankstruktur von SIMSAPI:
 ### Klassendiagramm
 Das Klassendiagramm stellt die wichtigsten Klassen und deren Beziehungen innerhalb des Systems dar:
 
-![Klassendiagramm](Klassendiagramm.pdf)
+![Klassendiagramm](Klassendiagramm.png)
 
 ## Ergebnisse der SAST-Prüfung
 

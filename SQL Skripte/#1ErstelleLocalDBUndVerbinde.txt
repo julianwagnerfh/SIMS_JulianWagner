@@ -1,2 +1,0 @@
-Powershell: sqllocaldb start
-Verbinde: (localdb)\MSSQLLocalDB

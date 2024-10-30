@@ -41,7 +41,7 @@ Für den erfolgreichen Betrieb von SIMSAPI sind folgende Systemvoraussetzungen e
 Es wird empfohlen, das System auf einem leistungsstarken PC auszuführen.
 
 ## Funktionen und Features
-Achtung: In aktuellen Version startet Blazor Frontend ("SIMSFrontend"-Projekt) und mit Docker Compose nicht bzw. verbindet sich API nicht mit SQL im Docker Compose, es gibt die Eskalationsfunktion und Logs noch nicht. Bei Projekt "UserFrontend" handelt es sich lediglich um einen zusätzlichen Test (Blazor spricht direkt mit DB und Code wird im Frontend ausgeführt). 
+Achtung: In aktuellen Version startet Blazor Frontend ("SIMSFrontend"-Projekt) mit Docker Compose nicht bzw. verbindet sich API nicht mit SQL im Docker Compose, es gibt die Eskalationsfunktion und Logs noch nicht. Bei Projekt "UserFrontend" handelt es sich lediglich um einen zusätzlichen Test (Blazor spricht direkt mit DB und Code wird im Frontend ausgeführt - nicht Teil des Hauptprojekt-Ziels). 
 
 ### Benutzerverwaltung
 

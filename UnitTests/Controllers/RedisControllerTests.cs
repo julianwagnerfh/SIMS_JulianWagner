@@ -9,6 +9,8 @@ using Microsoft.AspNetCore.Mvc;
 using SIMSAPI.Controllers;
 using SIMSAPI.Models;
 using StackExchange.Redis;
+using LoginUserDto = SIMSAPI.Controllers.LoginUserDto;
+using System.Net;
 
 namespace SIMSAPI.Tests.Controllers
 {
@@ -38,6 +40,36 @@ namespace SIMSAPI.Tests.Controllers
 
             // Assert
             Assert.IsType<ConflictObjectResult>(result);
+        }
+
+        [Fact]
+        public void Login_InvalidPassword_ReturnsUnauthorized()
+        {
+            // Arrange
+            var loginDto = new LoginUserDto { Username = "testUser", Password = "wrongPassword" };
+            _mockDatabase.Setup(db => db.KeyExists(It.IsAny<RedisKey>(), It.IsAny<CommandFlags>())).Returns(true);
+            _mockDatabase.Setup(db => db.HashGet(It.IsAny<RedisKey>(), "password", It.IsAny<CommandFlags>()))
+                .Returns(BCrypt.Net.BCrypt.HashPassword("correctPassword"));
+
+            // Act
+            var result = _controller.Login(loginDto);
+
+            // Assert
+            Assert.IsType<UnauthorizedObjectResult>(result);
+        }
+
+        [Fact]
+        public void DeleteUser_UserDoesNotExist_ReturnsNotFound()
+        {
+            // Arrange
+            string username = "nonExistentUser";
+            _mockDatabase.Setup(db => db.KeyExists(It.IsAny<RedisKey>(), It.IsAny<CommandFlags>())).Returns(false);
+
+            // Act
+            var result = _controller.DeleteUser(username);
+
+            // Assert
+            Assert.IsType<NotFoundObjectResult>(result);
         }
 
     }
